@@ -21,10 +21,10 @@ A pre-commit hook to verify that sensitive files are encrypted with [SOPS](https
 
 ```yaml
 repos:
-- repo: https://github.com/timmyb824/sops-file-encryption-checker
-  rev: latest  # Always use the latest version
-  hooks:
-    - id: sops-encryption-check
+  - repo: https://github.com/timmyb824/sops-file-encryption-checker
+    rev: latest # Always use the latest version
+    hooks:
+      - id: sops-encryption-check
 ```
 
 3. Install the pre-commit hook:
