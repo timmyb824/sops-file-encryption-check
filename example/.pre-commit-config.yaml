@@ -1,0 +1,5 @@
+repos:
+  - repo: https://github.com/timmyb824/sops-file-encryption-checker
+    rev: latest # Will always use the latest version
+    hooks:
+      - id: sops-encryption-check

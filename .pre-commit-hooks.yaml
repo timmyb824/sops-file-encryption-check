@@ -1,0 +1,7 @@
+- id: sops-encryption-check
+  name: Check SOPS encryption
+  description: Verify sensitive files are encrypted with SOPS
+  entry: scripts/sops-check.sh
+  language: script
+  types: [text]
+  pass_filenames: true

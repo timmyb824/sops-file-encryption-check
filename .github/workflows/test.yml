@@ -1,0 +1,45 @@
+name: Test SOPS File Encryption Checker
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install SOPS
+        run: |
+          SOPS_VERSION="3.8.1"  # Update this version as needed
+          curl -L "https://github.com/mozilla/sops/releases/download/v${SOPS_VERSION}/sops-v${SOPS_VERSION}.linux.amd64" -o sops
+          chmod +x sops
+          sudo mv sops /usr/local/bin/
+
+      - name: Make scripts executable
+        run: |
+          chmod +x scripts/sops-check.sh
+          chmod +x test/test-sops-check.sh
+
+      - name: Run tests
+        run: ./test/test-sops-check.sh
+
+      - name: Check pre-commit hook configuration
+        run: |
+          if ! [ -f .pre-commit-hooks.yaml ]; then
+            echo "Error: .pre-commit-hooks.yaml is missing"
+            exit 1
+          fi
+
+      - name: Update latest tag
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          git tag -f latest
+          git push -f origin latest
