@@ -1,5 +1,5 @@
 repos:
-  - repo: https://github.com/timmyb824/sops-file-encryption-checker
-    rev: latest # Will always use the latest version
+  - repo: https://github.com/timmyb824/sops-file-encryption-check
+    rev: v1.0.0 # Pin an immutable tag; run `pre-commit autoupdate` to bump
     hooks:
       - id: sops-encryption-check
