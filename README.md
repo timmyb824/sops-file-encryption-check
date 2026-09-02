@@ -2,7 +2,7 @@
 
 A pre-commit hook to verify that sensitive files are encrypted with [SOPS](https://github.com/mozilla/sops) before being committed.
 
-[![Test SOPS File Encryption Checker](https://github.com/timmyb824/sops-file-encryption-checker/actions/workflows/test.yml/badge.svg)](https://github.com/timmyb824/sops-file-encryption-checker/actions/workflows/test.yml)
+[![Test SOPS File Encryption Checker](https://github.com/timmyb824/sops-file-encryption-check/actions/workflows/test.yml/badge.svg)](https://github.com/timmyb824/sops-file-encryption-check/actions/workflows/test.yml)
 
 ## Features
 
@@ -11,7 +11,7 @@ A pre-commit hook to verify that sensitive files are encrypted with [SOPS](https
 - Support for custom patterns via `.sops-required-files`
 - Skips gitignored files automatically
 - Comprehensive test suite
-- Automatic updates via `latest` tag
+- Versioned releases; bump with `pre-commit autoupdate`
 
 ## Installation
 
@@ -21,8 +21,8 @@ A pre-commit hook to verify that sensitive files are encrypted with [SOPS](https
 
 ```yaml
 repos:
-  - repo: https://github.com/timmyb824/sops-file-encryption-checker
-    rev: latest # Always use the latest version
+  - repo: https://github.com/timmyb824/sops-file-encryption-check
+    rev: v1.0.0 # Use the latest released tag
     hooks:
       - id: sops-encryption-check
 ```
@@ -31,6 +31,12 @@ repos:
 
 ```bash
 pre-commit install
+```
+
+4. Keep the hook up to date over time:
+
+```bash
+pre-commit autoupdate
 ```
 
 ## Configuration
@@ -74,10 +80,19 @@ The project includes a GitHub Actions workflow that:
 
 1. Runs the test suite
 2. Verifies the pre-commit hook configuration
-3. Tests against the latest version of SOPS
-4. Automatically updates the `latest` tag on successful tests
+3. Tests against a pinned version of SOPS
 
-The `latest` tag is automatically updated whenever tests pass on the main branch, ensuring that users always get the most recent working version.
+### Releasing
+
+Releases use immutable [semver](https://semver.org/) tags (`vMAJOR.MINOR.PATCH`), which is
+what pre-commit expects in the `rev` field:
+
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+Consumers move to a newer release with `pre-commit autoupdate`.
 
 ## License
 
