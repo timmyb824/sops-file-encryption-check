@@ -76,21 +76,29 @@ chmod +x test/test-sops-check.sh
 
 ### GitHub Actions
 
-The project includes a GitHub Actions workflow that:
+The project runs two workflows:
 
-1. Runs the test suite
-2. Verifies the pre-commit hook configuration
-3. Tests against a pinned version of SOPS
+- **Test** — on every push and pull request: runs the test suite, verifies the
+  pre-commit hook configuration, and tests against a pinned version of SOPS.
+- **Release Please** — on push to `main`: maintains a release pull request and,
+  when it is merged, publishes the release (see below).
 
 ### Releasing
 
-Releases use immutable [semver](https://semver.org/) tags (`vMAJOR.MINOR.PATCH`), which is
-what pre-commit expects in the `rev` field:
+Releases are automated with
+[Release Please](https://github.com/googleapis/release-please-action) and use
+immutable [semver](https://semver.org/) tags (`vMAJOR.MINOR.PATCH`), which is what
+pre-commit expects in the `rev` field. Do **not** create or push tags by hand —
+that bypasses the changelog and GitHub Release.
 
-```bash
-git tag v1.0.0
-git push origin v1.0.0
-```
+To cut a release:
+
+1. Merge changes to `main` using [Conventional Commits](https://www.conventionalcommits.org/)
+   (`fix:` → patch, `feat:` → minor, `feat!:` / `BREAKING CHANGE:` → major).
+2. Release Please opens (or updates) a `chore(main): release X.Y.Z` pull request
+   with the version bump and `CHANGELOG.md` entry.
+3. Merge that pull request. Release Please pushes the `vX.Y.Z` tag and creates the
+   matching GitHub Release.
 
 Consumers move to a newer release with `pre-commit autoupdate`.
 
