@@ -63,6 +63,24 @@ else
 fi
 rm -f .secretsignore
 
+# Test 6: A tracked file matching .gitignore (but not .secretsignore) is still checked
+echo -e "\nTest 6: Tracked file matching .gitignore is not skipped by .secretsignore"
+echo "test/fixtures/secrets.yaml" >.secretsignore
+echo "API_KEY=1" >"$TEST_DIR/credentials.yaml"
+cp .gitignore .gitignore.bak
+echo "test/fixtures/credentials.yaml" >>.gitignore
+git add -f "$TEST_DIR/credentials.yaml"
+"$(dirname "$0")/../scripts/sops-check.sh" "$TEST_DIR/credentials.yaml"
+result=$?
+git rm -q --cached "$TEST_DIR/credentials.yaml"
+mv .gitignore.bak .gitignore
+rm -f .secretsignore
+if [ $result -eq 1 ]; then
+    echo "✅ Test passed: Tracked, gitignored file still checked"
+else
+    echo "❌ Test failed: Tracked, gitignored file was skipped"
+fi
+
 # Cleanup
 echo -e "\nCleaning up test files..."
 rm -rf "$TEST_DIR"

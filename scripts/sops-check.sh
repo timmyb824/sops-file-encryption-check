@@ -22,13 +22,23 @@ fi
 # Opt-out list for files that are intentionally unencrypted (gitignore syntax)
 SECRETS_IGNORE_FILE=".secretsignore"
 
+# Empty scratch repo so .secretsignore is matched in isolation, without the real
+# repo's .gitignore / .git/info/exclude (which would skip tracked, ignored files)
+SECRETS_IGNORE_SCRATCH_REPO=""
+cleanup_scratch_repo() { [ -n "$SECRETS_IGNORE_SCRATCH_REPO" ] && rm -rf "$SECRETS_IGNORE_SCRATCH_REPO"; }
+trap cleanup_scratch_repo EXIT
+
 # Function to check if a file is gitignored or listed in .secretsignore
 is_gitignored() {
     local file="$1"
     git check-ignore -q "$file" && return 0
     [ -f "$SECRETS_IGNORE_FILE" ] || return 1
-    # Reuse git's gitignore matcher; --no-index so tracked files match too
-    git -c core.excludesFile="$PWD/$SECRETS_IGNORE_FILE" check-ignore -q --no-index "$file"
+    if [ -z "$SECRETS_IGNORE_SCRATCH_REPO" ]; then
+        SECRETS_IGNORE_SCRATCH_REPO=$(mktemp -d) || return 1
+        git init -q "$SECRETS_IGNORE_SCRATCH_REPO" || return 1
+    fi
+    git -C "$SECRETS_IGNORE_SCRATCH_REPO" -c core.excludesFile="$PWD/$SECRETS_IGNORE_FILE" \
+        check-ignore -q --no-index "$file"
 }
 
 # Function to check if a file is SOPS-encrypted
