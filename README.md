@@ -10,6 +10,7 @@ A pre-commit hook to verify that sensitive files are encrypted with [SOPS](https
 - Default patterns for common sensitive files (`.env`, `.envrc`, etc.)
 - Support for custom patterns via `.sops-required-files`
 - Skips gitignored files automatically
+- Opt out specific files via `.secretsignore` (gitignore syntax)
 - Comprehensive test suite
 - Versioned releases; bump with `pre-commit autoupdate`
 
@@ -59,6 +60,17 @@ Create a `.sops-required-files` file in your repository root to specify addition
 secrets/production.yaml
 *.secret
 config/*.key
+```
+
+### Ignoring Files
+
+Files that are intentionally unencrypted (for example, Kubernetes `secrets.yaml`
+files that are populated by another tool) can be listed in `.secretsignore` in your
+repository root. It uses [gitignore syntax](https://git-scm.com/docs/gitignore#_pattern_format):
+
+```text
+k8s/**/secrets.yaml
+charts/*/credentials.yaml
 ```
 
 ## Development

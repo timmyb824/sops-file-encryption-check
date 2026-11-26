@@ -19,11 +19,16 @@ if [ -f "$CONFIG_FILE" ]; then
     source "$CONFIG_FILE"
 fi
 
-# Function to check if a file is gitignored
+# Opt-out list for files that are intentionally unencrypted (gitignore syntax)
+SECRETS_IGNORE_FILE=".secretsignore"
+
+# Function to check if a file is gitignored or listed in .secretsignore
 is_gitignored() {
     local file="$1"
-    git check-ignore -q "$file"
-    return $?
+    git check-ignore -q "$file" && return 0
+    [ -f "$SECRETS_IGNORE_FILE" ] || return 1
+    # Reuse git's gitignore matcher; --no-index so tracked files match too
+    git -c core.excludesFile="$PWD/$SECRETS_IGNORE_FILE" check-ignore -q --no-index "$file"
 }
 
 # Function to check if a file is SOPS-encrypted

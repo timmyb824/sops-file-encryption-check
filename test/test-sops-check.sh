@@ -52,6 +52,17 @@ else
     echo "❌ Test failed: Rejected non-sensitive file"
 fi
 
+# Test 5: File listed in .secretsignore is skipped
+echo -e "\nTest 5: File listed in .secretsignore"
+echo "test/fixtures/secrets.yaml" >.secretsignore
+"$(dirname "$0")/../scripts/sops-check.sh" "$TEST_DIR/secrets.yaml"
+if [ $? -eq 0 ]; then
+    echo "✅ Test passed: Skipped file listed in .secretsignore"
+else
+    echo "❌ Test failed: Did not honor .secretsignore"
+fi
+rm -f .secretsignore
+
 # Cleanup
 echo -e "\nCleaning up test files..."
 rm -rf "$TEST_DIR"
